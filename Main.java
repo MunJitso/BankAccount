@@ -90,13 +90,19 @@ public class Main {
 
     public static void accountSelection() {
         System.out.println("What account you want to select");
-        for (int i = 0; i < accounts.size(); i++) {
-            System.out.println(i + " - " + accounts.get(i));
+        try {
+            for (int i = 0; i < accounts.size(); i++) {
+                System.out.println(i + " - " + accounts.get(i));
+            }
+            System.out.print("Which account you want to log in? :");
+            Scanner selectionInput = new Scanner(System.in);
+            int selection = selectionInput.nextInt();
+            account = new AccountMethods(String.valueOf(accounts.get(selection).get(0)), Double.parseDouble(accounts.get(selection).get(1)), AccountType.valueOf(accounts.get(selection).get(3)), Integer.parseInt(accounts.get(selection).get(4)), Double.parseDouble(accounts.get(selection).get(2)));
+        } catch (IndexOutOfBoundsException err) {
+            System.out.println("There's no choice with the index u choose.");
+            accountSelection();
         }
-        System.out.print("Which account you want to log in? :");
-        Scanner selectionInput = new Scanner(System.in);
-        int selection = selectionInput.nextInt();
-        account = new AccountMethods(String.valueOf(accounts.get(selection).get(0)), Double.parseDouble(accounts.get(selection).get(1)), AccountType.valueOf(accounts.get(selection).get(3)), Integer.parseInt(accounts.get(selection).get(4)), Double.parseDouble(accounts.get(selection).get(2)));
+
     }
 
     public static void accountMenu() {
@@ -114,20 +120,27 @@ public class Main {
                     8. exit.
                     --------------------------------
                     """);
+
             System.out.print("Your Choice: ");
             Scanner choiceInput = new Scanner(System.in);
-            int choice = choiceInput.nextInt();
-            switch (choice) {
-                case 1 -> account.getAccountInfo();
-                case 2 -> account.deposit();
-                case 3 -> account.donate();
-                case 4 -> account.withdraw();
-                case 5 -> account.transfer();
-                case 6 -> accountSelection();
-                case 7 -> accountCreation();
-                case 8 -> menuScreen = false;
-                default -> throw new IllegalStateException("The choice you selected is not available here.");
+            try {
+                int choice = choiceInput.nextInt();
+                switch (choice) {
+                    case 1 -> account.getAccountInfo();
+                    case 2 -> account.deposit();
+                    case 3 -> account.donate();
+                    case 4 -> account.withdraw();
+                    case 5 -> account.transfer();
+                    case 6 -> accountSelection();
+                    case 7 -> accountCreation();
+                    case 8 -> menuScreen = false;
+                    default -> throw new IllegalStateException("The choice you selected is not available here.");
+                }
+            } catch (IllegalStateException err){
+                System.out.println("There's no choice with the index u choose.");
+                accountMenu();
             }
+
         }
     }
 }
