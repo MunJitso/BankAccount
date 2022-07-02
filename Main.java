@@ -71,7 +71,6 @@ public class Main {
         accountId = ThreadLocalRandom.current().nextInt(100000, 999999);
     }
     public static void accountMenu(){
-        // Account Details
         boolean menuScreen = true;
         while (menuScreen) {
             System.out.println("""
