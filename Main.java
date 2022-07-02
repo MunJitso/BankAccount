@@ -1,22 +1,30 @@
+import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Main {
+    private static final double pocket = 0.0;
+    public static List<List<String>> accounts = new ArrayList<>();
     public static StringBuilder ownerName = new StringBuilder();
     public static double balance = 0.0;
     public static AccountType accountType;
     public static int accountId;
     public static String[] forbiddenChars = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "[", "]", "/", "|", "\\", "\"", "!", "#", "@", "$", "%", "^", "*", "(", ")", "+", "=", ",", ";", ":", "'", "?", "<", ">", "`", "~", "."};
-    static AccountMethods account;
+    public static AccountMethods account;
+
     public static void main(String[] args) {
-        System.out.println("Hello User!");
-        accountCreation();
-        account = new AccountMethods(ownerName.toString(), balance, accountType, accountId);
+        if (accounts.isEmpty()){
+            accountCreation();
+        } else {
+            accountSelection();
+        }
         accountMenu();
     }
 
     public static void accountCreation() {
+        List<String> bankAccount = new ArrayList<>();
         // ownerName
         boolean validName = true;
         String ownerNameTemp = "";
@@ -43,6 +51,8 @@ public class Main {
                 ownerName.append(ownerCapitalName[i].substring(0, 1).toUpperCase()).append(ownerCapitalName[i].substring(1)).append(" ");
             }
         }
+        bankAccount.add(String.valueOf(ownerName));
+
         // Balance
         boolean validBalance;
         do {
@@ -56,6 +66,8 @@ public class Main {
                 validBalance = false;
             }
         } while (!validBalance);
+        bankAccount.add(String.valueOf(balance));
+        bankAccount.add(String.valueOf(pocket));
 
         // Account Type
         System.out.print("Student or Normal Account? (s if you're student): ");
@@ -66,11 +78,28 @@ public class Main {
         } else {
             accountType = AccountType.NORMAL;
         }
+        bankAccount.add(String.valueOf(accountType));
 
         //Account ID
         accountId = ThreadLocalRandom.current().nextInt(100000, 999999);
+        bankAccount.add(String.valueOf(accountId));
+        accounts.add(bankAccount);
+
+        account = new AccountMethods(String.valueOf(ownerName), balance, accountType, accountId, pocket);
     }
-    public static void accountMenu(){
+
+    public static void accountSelection() {
+        System.out.println("What account you want to select");
+        for (int i = 0; i < accounts.size(); i++) {
+            System.out.println(i + " - " + accounts.get(i));
+        }
+        System.out.print("Which account you want to log in? :");
+        Scanner selectionInput = new Scanner(System.in);
+        int selection = selectionInput.nextInt();
+        account = new AccountMethods(String.valueOf(accounts.get(selection).get(0)), Double.parseDouble(accounts.get(selection).get(1)), AccountType.valueOf(accounts.get(selection).get(3)), Integer.parseInt(accounts.get(selection).get(4)), Double.parseDouble(accounts.get(selection).get(2)));
+    }
+
+    public static void accountMenu() {
         boolean menuScreen = true;
         while (menuScreen) {
             System.out.println("""
@@ -80,9 +109,12 @@ public class Main {
                     3. donate.
                     4. withdraw.
                     5. transfer.
-                    6. exit.
+                    6. logout
+                    7. create another account.
+                    8. exit.
                     --------------------------------
                     """);
+            System.out.print("Your Choice: ");
             Scanner choiceInput = new Scanner(System.in);
             int choice = choiceInput.nextInt();
             switch (choice) {
@@ -91,9 +123,11 @@ public class Main {
                 case 3 -> account.donate();
                 case 4 -> account.withdraw();
                 case 5 -> account.transfer();
-                case 6 -> menuScreen = false;
+                case 6 -> accountSelection();
+                case 7 -> accountCreation();
+                case 8 -> menuScreen = false;
+                default -> throw new IllegalStateException("The choice you selected is not available here.");
             }
         }
-
     }
 }

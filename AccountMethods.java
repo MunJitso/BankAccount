@@ -5,13 +5,14 @@ public class AccountMethods {
     private double balance;
     private final AccountType accountType;
     private final int accountId;
-    private double pocket = 0.0;
+    private double pocket;
 
-    public AccountMethods(String ownerName, double balance, AccountType accountType, int accountId) {
+    public AccountMethods(String ownerName, double balance, AccountType accountType, int accountId, double pocket) {
         this.ownerName = ownerName;
         this.balance = balance;
         this.accountType = accountType;
         this.accountId = accountId;
+        this.pocket = pocket;
     }
 
     public void getAccountInfo() {
@@ -19,7 +20,7 @@ public class AccountMethods {
         System.out.println("-> Your Name: " + this.ownerName);
         System.out.println("-> Your balance: " + this.balance);
         System.out.println("-> Your pocket: " + this.pocket);
-        System.out.println("-> Your Account's Type: " + this.accountType);
+        System.out.println("-> Your Account's Type: " + this.accountType + "\n");
     }
 
     public void donate() {
@@ -68,7 +69,7 @@ public class AccountMethods {
         System.out.print("How much you want to withdraw?: ");
         Scanner withdrawInput = new Scanner(System.in);
         double withdrawAmount = withdrawInput.nextDouble();
-        if (withdrawAmount > 0) {
+        if (withdrawAmount > 0 && this.balance-withdrawAmount >= 0) {
             this.balance -= withdrawAmount;
             this.pocket += withdrawAmount;
             System.out.println("You have right now in your pocket " + this.pocket + "$");
@@ -85,12 +86,12 @@ public class AccountMethods {
             double studentTransfer = balance - transferAmount - transferAmount * 0.015 - 0.30;
             double normalTransfer = balance - transferAmount - transferAmount * 0.039 - 0.30;
             if (this.accountType == AccountType.STUDENT) {
-                if (studentTransfer > 0) {
+                if (studentTransfer > 0 && this.balance-studentTransfer >= 0) {
                     this.balance -= studentTransfer;
                 } else {
                     System.out.println("We cannot issue the process.");
                 }
-            } else if (this.accountType == AccountType.NORMAL && normalTransfer > 0) {
+            } else if (this.accountType == AccountType.NORMAL && normalTransfer > 0 && this.balance-normalTransfer >= 0) {
                 this.balance -= normalTransfer;
             }
         } else {
