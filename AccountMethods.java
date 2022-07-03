@@ -36,7 +36,7 @@ public class AccountMethods {
                     System.out.println("You can not donate.");
                 }
             } else {
-                double balanceWithTaxes = balance - donateAmount - donateAmount * 0.0135;
+                double balanceWithTaxes = balance - donateAmount * 1.0135;
                 if (balanceWithTaxes >= 0) {
                     this.balance = balanceWithTaxes;
                     System.out.println("Your new balance is " + this.balance + "$");
