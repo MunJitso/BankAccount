@@ -5,4 +5,4 @@ You can create a bank and until now you can only create one account, and there's
 
 I'm still fixing some bugs i just found.
 Just some few functions for now but I hope soon I'll make it ..( btw, I dont support capitilism lol )
-- after adding multi accounts, probably i'm going to make donate option useful, i have ideas but lazy to make them real lol.
+nvm guys i just made "transfert" and "donate" functionnal... ( like after.. 4 months but WHOO CARES )
