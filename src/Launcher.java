@@ -1,31 +1,23 @@
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Scanner;
+package src;
+
+import src.Accounts.Account;
+import src.Accounts.AccountType;
+
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Main {
-    private static final double pocket = 0.0;
-    public static List<List<String>> accounts = new ArrayList<>();
-    public static StringBuilder ownerName = new StringBuilder();
-    public static double balance = 0.0;
-    public static AccountType accountType;
-    public static int accountId;
+public class Launcher {
+    public static Map<Integer, Account> accounts = new HashMap<>();
     public static String[] forbiddenChars = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "[", "]", "/", "|", "\\", "\"", "!", "#", "@", "$", "%", "^", "*", "(", ")", "+", "=", ",", ";", ":", "'", "?", "<", ">", "`", "~", "."};
-    public static AccountMethods account;
 
     public static void main(String[] args) {
-        if (accounts.isEmpty()){
-            accountCreation();
-        } else {
-            accountSelection();
-        }
-        accountMenu();
+        if (accounts.isEmpty()) accountCreation();
+        else accountSelection();
     }
 
     public static void accountCreation() {
-        List<String> bankAccount = new ArrayList<>();
         // ownerName
+        StringBuilder ownerName = new StringBuilder();
         boolean validName = true;
         String ownerNameTemp = "";
         do {
@@ -33,13 +25,13 @@ public class Main {
             Scanner nameInput = new Scanner(System.in);
             String name = nameInput.nextLine();
             for (String forbiddenChar : forbiddenChars) {
-                if (name.contains(forbiddenChar)) {
+                if (!name.contains(forbiddenChar)) {
+                    validName = true;
+                    ownerNameTemp = name;
+                } else {
                     System.out.println("A name does not accept special characters or numbers");
                     validName = false;
                     break;
-                } else if (!name.contains(forbiddenChar)) {
-                    validName = true;
-                    ownerNameTemp = name;
                 }
             }
         } while (!validName);
@@ -51,9 +43,9 @@ public class Main {
                 ownerName.append(ownerCapitalName[i].substring(0, 1).toUpperCase()).append(ownerCapitalName[i].substring(1)).append(" ");
             }
         }
-        bankAccount.add(String.valueOf(ownerName));
 
         // Balance
+        double balance = 0.0;
         boolean validBalance;
         do {
             try {
@@ -66,10 +58,9 @@ public class Main {
                 validBalance = false;
             }
         } while (!validBalance);
-        bankAccount.add(String.valueOf(balance));
-        bankAccount.add(String.valueOf(pocket));
 
         // Account Type
+        AccountType accountType;
         System.out.print("Student or Normal Account? (s if you're student): ");
         Scanner accTypeInput = new Scanner(System.in);
         String accType = accTypeInput.nextLine();
@@ -78,34 +69,31 @@ public class Main {
         } else {
             accountType = AccountType.NORMAL;
         }
-        bankAccount.add(String.valueOf(accountType));
 
         //Account ID
-        accountId = ThreadLocalRandom.current().nextInt(100000, 999999);
-        bankAccount.add(String.valueOf(accountId));
-        accounts.add(bankAccount);
-
-        account = new AccountMethods(String.valueOf(ownerName), balance, accountType, accountId, pocket);
+        int accountId = ThreadLocalRandom.current().nextInt(100000, 999999);
+        Account account = new Account(accountId, ownerName.toString(), balance, accountType, 0.0);
+        accounts.put(accountId, account);
+        accountMenu(account);
     }
 
     public static void accountSelection() {
         System.out.println("What account you want to select");
         try {
-            for (int i = 0; i < accounts.size(); i++) {
-                System.out.println(i + " - " + accounts.get(i));
-            }
-            System.out.print("Which account you want to log in? :");
+            accounts.forEach((key, value) -> System.out.println("Account Id: " + key + ", Account Name: " + value.getOwnerName()));
+            System.out.print("Which account you want to log in? ( use Account ID ):");
             Scanner selectionInput = new Scanner(System.in);
             int selection = selectionInput.nextInt();
-            account = new AccountMethods(String.valueOf(accounts.get(selection).get(0)), Double.parseDouble(accounts.get(selection).get(1)), AccountType.valueOf(accounts.get(selection).get(3)), Integer.parseInt(accounts.get(selection).get(4)), Double.parseDouble(accounts.get(selection).get(2)));
-        } catch (IndexOutOfBoundsException err) {
-            System.out.println("There's no choice with the index u choose.");
+            Account account = accounts.get(selection);
+            accountMenu(account);
+        } catch (InputMismatchException err) {
+            System.out.println("There's no choice with the index you choose.");
             accountSelection();
         }
 
     }
 
-    public static void accountMenu() {
+    public static void accountMenu(Account account) {
         boolean menuScreen = true;
         while (menuScreen) {
             System.out.println("""
@@ -128,17 +116,17 @@ public class Main {
                 switch (choice) {
                     case 1 -> account.getAccountInfo();
                     case 2 -> account.deposit();
-                    case 3 -> account.donate();
+                    case 3 -> account.donate(accounts);
                     case 4 -> account.withdraw();
-                    case 5 -> account.transfer();
+                    case 5 -> account.transfer(accounts);
                     case 6 -> accountSelection();
                     case 7 -> accountCreation();
                     case 8 -> menuScreen = false;
                     default -> throw new IllegalStateException("The choice you selected is not available here.");
                 }
-            } catch (IllegalStateException err){
+            } catch (IllegalStateException err) {
                 System.out.println("There's no choice with the index u choose.");
-                accountMenu();
+                accountMenu(account);
             }
 
         }
